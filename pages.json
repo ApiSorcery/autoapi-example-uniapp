@@ -3,7 +3,8 @@
     {
       "path": "pages/user/index/index",
       "style": {
-        "navigationBarTitleText": "用户列表页"
+        "navigationBarTitleText": "用户列表页",
+        "enablePullDownRefresh": true
       }
     },
     {
