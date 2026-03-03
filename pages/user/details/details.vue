@@ -39,29 +39,17 @@
           :clearIcon="false" :localdata="optionsMap['status']" v-model="form.model.status">
         </uni-data-picker>
       </view>
-      <view class="field">
+      <view class="multi-field">
         <view class="label">Address:</view>
-        <input class="value" :class="{placeholder:!form.model.address,disabled:false}" placeholder="请输入"
-          v-model="form.model.address" :disabled="false" />
+        <textarea class="m-textarea" v-model="form.model.address" :auto-height="true" :maxlength="500" placeholder="请输入"
+          :cursor-spacing="30" />
       </view>
-      <view class="field">
+      <view class="image-field">
         <view class="label">
-          <text class="required">*</text>
           <text>Avatar:</text>
         </view>
-        <view class="upload" @click="handleUpload">+</view>
-      </view>
-      <view class="attachments" v-if="form.model.attachments?.length">
-        <view class="attachment" v-for="attachment in form.model.attachments" :key="attachment.id">
-          <view class="file-content">
-            <view class="name">{{attachment.name}}</view>
-            <view class="size-preview">
-              <view class="size">{{attachment.size}}</view>
-              <view class="preview" @click="()=>handlePreview(attachment.path)">预览</view>
-            </view>
-          </view>
-          <view class="remove" @click="()=>handleRemove(attachment)">-</view>
-        </view>
+        <image class="upload" v-if="form.model.avatar" :src="form.model.avatar" @click="handleUpload"></image>
+        <image v-else class="upload" :src="form.defaultImageBase64" @click="handleUpload"></image>
       </view>
     </view>
     <view class="commands">
@@ -83,6 +71,7 @@
     onLoad
   } from '@dcloudio/uni-app';
   import * as userService from '@/services/user.js';
+
   const optionsMap = {
     status: [{
       value: 'true',
@@ -110,6 +99,7 @@
     userId: null,
     loading: false,
     submitLoading: false,
+    defaultImageBase64: 'data:image/png;base64,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',
     model: {
       code: '',
       name: '',
@@ -166,7 +156,7 @@
         const tempFile = chooseMessageFileRes.tempFiles[0];
         const fileName = tempFile.name.substring(0, tempFile.name.lastIndexOf('.'));
         const fileExtension = tempFile.name.substring(tempFile.name.lastIndexOf('.') + 1);
-        if (['png', 'jpg', 'jpeg', 'pdf', 'docx', 'doc'].includes(fileExtension)) {
+        if (['png', 'jpg', 'jpeg', 'pdf'].includes(fileExtension)) {
           form.model.attachments.push({
             id: (form.model.attachments || []).length + 1,
             name: `${fileName.length>10 ? fileName.substring(0,10) + '...' :fileName}.${fileExtension}`,
@@ -185,71 +175,6 @@
       }
     });
     // #endif
-  }
-
-  const handlePreview = (filePath) => {
-    console.log('handlePreview', filePath);
-    const tempFileExtension = filePath.substring(filePath.lastIndexOf(".") + 1)
-    const fileExtension = tempFileExtension.indexOf('?') > -1 ?
-      tempFileExtension.substring(0, tempFileExtension.indexOf('?')) :
-      tempFileExtension;
-    console.log('fileExtension', fileExtension);
-    if (['png', 'jpg', 'jpeg'].includes(fileExtension)) {
-      uni.previewImage({
-        urls: [filePath]
-      });
-    } else if (['pdf', 'docx', 'doc'].includes(fileExtension)) {
-      // #ifdef MP-WEIXIN
-      uni.showLoading({
-        title: '加载中...'
-      });
-      uni.downloadFile({
-        url: filePath,
-        success: function(res) {
-          console.log('downloadFile success', res);
-          if (res.statusCode === 200) {
-            uni.openDocument({
-              filePath: res.tempFilePath,
-              showMenu: true,
-              success: (openDocumentRes) => {
-                uni.hideLoading();
-                console.log('打开文档成功', openDocumentRes);
-              },
-              fail: (openDocumentErr) => {
-                console.log('openDocumentErr', openDocumentErr);
-                uni.hideLoading();
-                uni.showToast({
-                  title: '预览文件失败',
-                  icon: "error"
-                });
-              }
-            });
-          } else {
-            uni.showToast({
-              title: `${res.statusCode}-文件下载失败`
-            });
-          }
-        },
-        fail: (err) => {
-          console.log('uni.downloadFile failed', err);
-          uni.showToast({
-            title: '文件下载失败',
-            icon: "error",
-          });
-        }
-      });
-      // #endif
-    } else {
-      uni.showToast({
-        title: '文件类型不支持！',
-        icon: 'error'
-      });
-    }
-  }
-
-  const handleRemove = (attachment) => {
-    console.log('handleRemove', attachment);
-    form.model.attachments = form.model.attachments.filter(r => r.id !== attachment.id);
   }
 
   const handleCancel = () => {
@@ -386,6 +311,17 @@
       flex: 1;
       overflow: auto;
 
+      .label {
+        font-size: 28rpx;
+        font-weight: 400;
+        color: #1A1A1A;
+
+        .required {
+          color: #FF3B30;
+          margin-right: 8rpx;
+        }
+      }
+
       .field {
         background: #ffffff;
         height: 96rpx;
@@ -395,17 +331,6 @@
         justify-content: space-between;
         align-items: center;
         gap: 8px;
-
-        .label {
-          font-size: 28rpx;
-          font-weight: 400;
-          color: #1A1A1A;
-
-          .required {
-            color: #FF3B30;
-            margin-right: 8rpx;
-          }
-        }
 
         .value {
           flex: 1;
@@ -423,69 +348,43 @@
             color: #c0c0c0;
           }
         }
-
-        .upload {
-          width: 46rpx;
-          height: 42rpx;
-          line-height: 42rpx;
-          padding-bottom: 4rpx;
-          text-align: center;
-          background: #3A66F2;
-          color: white;
-          border-radius: 42rpx;
-          font-size: 40rpx;
-          font-weight: bold;
-        }
       }
 
-      .attachments {
-        background: #FAFAFC;
+      .multi-field {
+        background: #ffffff;
+        padding: 16rpx 32rpx;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
 
-        .attachment {
-          padding: 16rpx 32rpx;
-          border-top: 1px solid rgba(0, 0, 0, 0.08);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+        .m-textarea {
+          text-align: left;
+          margin-top: 10px;
+          padding: 8px;
+          width: calc(100% - 24px);
+          min-height: 50px;
+          border: 1px solid rgba(198, 203, 216, 1);
+          border-radius: 4px;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 1);
 
-          .file-content {
-            .name {
-              font-size: 14px;
-              font-weight: 400;
-              color: #636366;
-            }
-
-            .size-preview {
-              margin-top: 8rpx;
-              display: flex;
-
-              .size {
-                font-size: 12px;
-                font-weight: 400;
-                color: #C7C7CC;
-              }
-
-              .preview {
-                margin-left: 48rpx;
-                font-size: 12px;
-                font-weight: 400;
-                color: #3A66F2;
-              }
-            }
+          .uni-input-placeholder {
+            color: rgba(105, 114, 135, 1);
           }
+        }
 
-          .remove {
-            width: 46rpx;
-            height: 42rpx;
-            line-height: 42rpx;
-            padding-bottom: 4rpx;
-            text-align: center;
-            background: #FF3B30;
-            color: white;
-            border-radius: 42rpx;
-            font-size: 40rpx;
-            font-weight: bold;
-          }
+      }
+
+      .image-field {
+        background: #ffffff;
+        padding: 16rpx 32rpx;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+        .upload {
+          margin-top: 10px;
+          width: 100px;
+          height: 100px;
+          background: #3A66F2;
+          color: white;
+          border-radius: 80px;
         }
       }
     }
