@@ -1,10 +1,10 @@
 <template>
-  <view class="page-index">
+  <view class="page-user-index">
     <view class="items" v-if="(table.dataList||[]).length">
       <uni-swipe-action class="uni-swipe-action">
         <uni-swipe-action-item class="uni-swipe-action-item" v-for="(item,index) in table.dataList" :key="index"
           :right-options="swipeOptions" :autoClose="true" @click="(e)=>handleSwipeClick(e,item)">
-          <view class="item" @click="()=>handleView(item)">
+          <view class="item" @click="()=>handleEdit(item)">
             <view class="header">
               <view class="name">{{`${item.name} - ${item.code}`}}</view>
               <view class="status" :style="{color:optionsMap['status'].find(r=>r.value===item.status)?.color}">
@@ -41,7 +41,7 @@
     </view>
     <view class="footer-commands">
       <view class="commands">
-        <view class="command" @click="handleAdd">上传证书</view>
+        <view class="command" @click="handleAdd">新建用户</view>
       </view>
     </view>
   </view>
@@ -183,23 +183,23 @@
     }
   }
 
-  const handleView = (item) => {
-    console.log('handleView', item);
+  const handleEdit = (item) => {
+    console.log('handleEdit', item);
     uni.navigateTo({
-      url: `/pages/training/certification/details/details?operateType=view&certificationId=${item.id}`
+      url: `/pages/user/details/details?operateType=edit&userId=${item.id}`
     })
   }
 
   const handleAdd = () => {
     console.log('handleAdd');
     uni.navigateTo({
-      url: '/pages/training/certification/details/details?operateType=add'
+      url: '/pages/user/details/details?operateType=add'
     })
   }
 </script>
 
 <style lang="scss" scoped>
-  .page-index {
+  .page-user-index {
     min-height: 100%;
     background-color: #eceef5;
 
