@@ -40,8 +40,9 @@
       暂无数据
     </view>
     <view class="footer-commands">
-      <view class="commands">
-        <view class="command" @click="handleCommand">操作</view>
+      <view class="commands" @click="handleCommand">
+        <text>操作 </text>
+        <icon type="download" size="16" color="#FFFFFF"/>
       </view>
     </view>
   </view>
@@ -403,7 +404,6 @@
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 16rpx 32rpx;
       padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
       padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
       background: #FFFFFF;
@@ -412,22 +412,16 @@
       justify-content: flex-end;
 
       .commands {
-        flex: 1;
+        width: 100px;
+        height: 88rpx;
+        background: #3A66F2;
+        font-size: 28rpx;
+        font-weight: 400;
+        color: #FFFFFF;
         display: flex;
-
-        .command {
-          flex: 1;
-          padding-left: 56rpx;
-          padding-right: 56rpx;
-          height: 72rpx;
-          line-height: 72rpx;
-          background: #3A66F2;
-          border-radius: 24rpx;
-          font-size: 28rpx;
-          font-weight: 400;
-          color: #FFFFFF;
-          text-align: center;
-        }
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
       }
     }
   }
