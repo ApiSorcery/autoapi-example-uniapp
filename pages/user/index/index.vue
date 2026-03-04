@@ -41,7 +41,7 @@
     </view>
     <view class="footer-commands">
       <view class="commands">
-        <view class="command" @click="handleAdd">新建用户</view>
+        <view class="command" @click="handleCommand">操作</view>
       </view>
     </view>
   </view>
@@ -198,11 +198,92 @@
     })
   }
 
+  const handleCommand = () => {
+    uni.showActionSheet({
+      itemList: ['新增用户', '导出'],
+      success: (res) => {
+        // res.tapIndex 表示点击了第几个按钮，0是第一个，1是第二个
+        if (res.tapIndex === 0) {
+          handleAdd();
+        } else if (res.tapIndex === 1) {
+          handleExport();
+        }
+      },
+      fail: (err) => {
+        console.log('用户取消选择', err)
+      }
+    })
+  }
+
   const handleAdd = () => {
     console.log('handleAdd');
     uni.navigateTo({
       url: '/pages/user/details/details?operateType=add'
     })
+  }
+
+  const handleExport = async () => {
+    // #ifdef H5
+    // ************ H5端：使用 Blob 处理二进制流 ************
+    uni.showLoading({
+      title: '生成文件中...',
+      mask: true
+    });
+    const res = await userService.exportUsers({});
+    // 创建下载链接
+    const blobUrl = res.tempFilePath;
+    const fileName = `users-${dayjs().format('YYYYMMDDHHmmssSSS')}.xlsx`; // 根据实际情况设置
+    debugger;
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+
+    // 清理
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+
+    uni.hideLoading();
+    uni.showToast({
+      title: '导出成功',
+      icon: 'success'
+    });
+    // #endif
+    // #ifndef H5
+    uni.showLoading({
+      title: '生成文件中...',
+      mask: true
+    });
+    const res = await userService.exportUsers({});
+    // 保存文件到应用沙盒（持久化）
+    uni.saveFile({
+      tempFilePath: res.tempFilePath,
+      success: (saveRes) => {
+        uni.hideLoading();
+        uni.showToast({
+          title: '导出成功'
+        });
+        console.log('文件保存路径：', saveRes.savedFilePath);
+
+        // 可选：直接打开文件预览
+        uni.openDocument({
+          filePath: saveRes.savedFilePath,
+          showMenu: true,
+          fail: (err) => {
+            console.log('打开文件失败，但已保存', err);
+          }
+        });
+      },
+      fail: (err) => {
+        uni.hideLoading();
+        uni.showToast({
+          title: '文件保存失败',
+          icon: 'none'
+        });
+      }
+    });
+    // #endif
   }
 </script>
 

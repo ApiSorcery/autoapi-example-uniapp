@@ -37,6 +37,10 @@ service.interceptor.request((config, cancel) => {
  */
 service.interceptor.response(async (response) => {
   console.log('response interceptor', response);
+  if (response.config.method === 'DOWNLOAD') {
+    return response;
+  }
+
   if (response.data.status === 0) {
     return response.data.data;
   }

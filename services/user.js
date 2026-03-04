@@ -10,11 +10,21 @@ export const addUser = async function(data) {
 }
 
 /**
+ * Batch export users (Excel)
+ */
+export const exportUsers = async function(params) {
+  return await request.download(
+    `/user/export`,
+    params
+  );
+}
+
+/**
  * Get single user
  */
 export const getUserOne = async function(id) {
   return await request.get(
-    `/user/${id}/`
+    `/user/${id}`
   );
 }
 
