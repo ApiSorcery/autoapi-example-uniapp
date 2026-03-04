@@ -21,10 +21,6 @@ service.interceptor.request((config, cancel) => {
   config.baseUrl = '/demo-api';
   if (config.method === 'GET') {
     config.header['content-type'] = ''
-  } else if (config.method === 'POST') {
-    config.header['content-type'] = 'application/x-www-form-urlencoded'
-  } else {
-    config.header['content-type'] = 'application/json'
   }
 
   if (config.method === 'DELETE') {
@@ -186,7 +182,8 @@ const upload = (url, {
   formData = {},
   custom = {},
   params = {},
-  getTask
+  getTask,
+  onProgress
 }) => {
   return new Promise((resolve, reject) => {
     let next = true
@@ -259,10 +256,20 @@ const upload = (url, {
     }
     // #endif
     if (!next) return
-    const requestTask = uni.uploadFile(_config)
+
+    // 执行上传
+    const uploadTask = uni.uploadFile(_config)
     if (handleRe.getTask) {
-      handleRe.getTask(requestTask, handleRe)
+      handleRe.getTask(uploadTask, handleRe)
     }
+
+    // 处理进度监听 (如果平台支持)
+    if (onProgress && uploadTask.onProgressUpdate) {
+      uploadTask.onProgressUpdate((res) => {
+        onProgress(res);
+      });
+    }
+
   })
 }
 

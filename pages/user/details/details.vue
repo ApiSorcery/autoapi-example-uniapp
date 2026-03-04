@@ -48,7 +48,7 @@
         <view class="label">
           <text>Avatar:</text>
         </view>
-        <image class="upload" v-if="form.model.avatar" :src="form.model.avatar" @click="handleUpload"></image>
+        <image class="upload" mode="aspectFill" v-if="form.model.avatar" :src="form.model.avatar" @click="handleUpload"></image>
         <image v-else class="upload" :src="form.defaultImageBase64" @click="handleUpload"></image>
       </view>
     </view>
@@ -71,6 +71,7 @@
     onLoad
   } from '@dcloudio/uni-app';
   import * as userService from '@/services/user.js';
+  import * as fileService from '@/services/file.js'
 
   const optionsMap = {
     status: [{
@@ -147,34 +148,38 @@
 
   const handleUpload = () => {
     console.log('handleUpload');
-    // #ifdef MP-WEIXIN
-    wx.chooseMessageFile({
-      count: 1, // 默认100
-      type: 'all',
-      success: (chooseMessageFileRes) => {
-        console.log('chooseMessageFileRes', chooseMessageFileRes);
-        const tempFile = chooseMessageFileRes.tempFiles[0];
-        const fileName = tempFile.name.substring(0, tempFile.name.lastIndexOf('.'));
-        const fileExtension = tempFile.name.substring(tempFile.name.lastIndexOf('.') + 1);
-        if (['png', 'jpg', 'jpeg', 'pdf'].includes(fileExtension)) {
-          form.model.attachments.push({
-            id: (form.model.attachments || []).length + 1,
-            name: `${fileName.length>10 ? fileName.substring(0,10) + '...' :fileName}.${fileExtension}`,
-            size: `${(tempFile.size/1024/1024).toFixed(2)}M`,
-            path: tempFile.path
-          });
-        } else {
-          uni.showToast({
-            title: '文件类型不符！',
-            icon: 'error'
-          });
-        }
+    uni.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      extension: ['.png', '.jpg', '.jpeg', '.webp'], // 可选，限制文件后缀名
+      sourceType: ['album', 'camera'],
+      success: async (chooseResult) => {
+        const tempFilePath = chooseResult.tempFilePaths[0];
+        uni.showLoading({
+          title: '上传中...'
+        });
+        const imageId = await fileService.uploadFile({
+          // #ifdef APP-PLUS
+          files: chooseResult.tempFiles,
+          // #endif
+          // #ifdef MP-ALIPAY
+          fileType: 'image',
+          // #endif
+          filePath: tempFilePath,
+          name: 'file',
+          onProgress: (progressRes) => {
+            console.log('上传进度：', progressRes.progress);
+            // 可以在这里更新进度条
+          }
+        })
+        console.log('uni.uploadFile success', imageId);
+        form.model.avatar = `https://www.apisorcery.com/demo-api/file/${imageId}`
+        uni.hideLoading();
       },
       fail: (error) => {
-        console.log('uni.chooseMedia error', JSON.stringify(error));
+        console.log('uni.chooseImage error', JSON.stringify(error));
       }
-    });
-    // #endif
+    })
   }
 
   const handleCancel = () => {
@@ -222,10 +227,10 @@
         return;
       }
 
-      if ((form.model.attachments || []).length === 0) {
+      if (!form.model.avatar) {
         uni.showToast({
           icon: 'none',
-          title: '请上传附件'
+          title: '用户头像不能为空'
         });
         return;
       }
@@ -248,10 +253,7 @@
         delete data.external_train_user;
       }
 
-      const addRes = await trainingCertificationService.add(data);
-      await Promise.all(
-        (form.model.attachments || []).map(async (r) => uploadSingleFile(addRes.id, r.path))
-      );
+      await userService.add(data);
       uni.showToast({
         icon: "success",
         title: '提交成功',
@@ -266,36 +268,6 @@
     } finally {
       form.submitLoading = false;
     }
-  }
-
-  const uploadSingleFile = async (userId, tempFilePath) => {
-    return new Promise((resolve, reject) => {
-      uni.uploadFile({
-        url: `${appStore.getApiServer}/train_staff/certificate_attachment/?menu_url=pages/training/certification/details/details`,
-        filePath: tempFilePath,
-        name: 'attachment',
-        header: {
-          'Authorization': `Bearer ${userStore.getToken}`,
-        },
-        formData: {
-          certificate: userId
-        },
-        success: (uploadRes) => {
-          console.log('uni.uploadFile success json', uploadRes.data);
-          var resultObj = JSON.parse(uploadRes.data);
-          console.log('uni.uploadFile success object', resultObj);
-          if (resultObj.code === 200) {
-            resolve();
-          } else {
-            reject(resultObj.code)
-          }
-        },
-        fail: (error) => {
-          console.log('uni.uploadFile error', JSON.stringify(error));
-          reject(error);
-        }
-      });
-    })
   }
 </script>
 

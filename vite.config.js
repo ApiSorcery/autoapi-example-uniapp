@@ -10,7 +10,7 @@ export default defineConfig({
 	server: {
 		proxy: {
 			'/demo-api': {
-				"target": "https://www.apisorcery.com/demo-api/", // 大众生产环境
+				"target": "https://www.apisorcery.com/demo-api/",
 				changeOrigin: true,
 				rewrite: path => {
 					return path.replace(/^\/demo-api/, '')
