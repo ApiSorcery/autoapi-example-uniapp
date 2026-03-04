@@ -1,7 +1,25 @@
 import request from '@/utils/request/index.js';
 
 /**
- * 获取所有用户（分页）
+ * Add user
+ */
+export const addUser = async function(data) {
+  return await request.post(
+    `/user`, data
+  );
+}
+
+/**
+ * Get single user
+ */
+export const getUserOne = async function(id) {
+	return await request.get(
+		`/user/${id}/`
+	);
+}
+
+/**
+ * Query user list with pagination
  */
 export const getUserPaged = async function(data) {
   return await request.post(
@@ -10,10 +28,10 @@ export const getUserPaged = async function(data) {
 }
 
 /**
- * 获取单个用户
+ * Modify user information
  */
-export const getUserOne = async function(id) {
-	return await request.get(
-		`/user/${id}/`
-	);
+export const modifyUser = async function(data) {
+  return await request.patch(
+    `/user`, data
+  );
 }

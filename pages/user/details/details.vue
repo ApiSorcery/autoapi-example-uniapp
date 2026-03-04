@@ -35,9 +35,7 @@
         <view class="label">
           <text>Status:</text>
         </view>
-        <uni-data-picker class="value" placeholder="Please Select" popup-title="Status Options" :readonly="false"
-          :clearIcon="false" :localdata="optionsMap['status']" v-model="form.model.status">
-        </uni-data-picker>
+        <switch class="value" :checked="form.model.status" @change="handleStatusChange"></switch>
       </view>
       <view class="multi-field">
         <view class="label">Address:</view>
@@ -48,7 +46,8 @@
         <view class="label">
           <text>Avatar:</text>
         </view>
-        <image class="upload" mode="aspectFill" v-if="form.model.avatar" :src="form.model.avatar" @click="handleUpload"></image>
+        <image class="upload" mode="aspectFill" v-if="form.model.avatar" :src="form.model.avatar" @click="handleUpload">
+        </image>
         <image v-else class="upload" :src="form.defaultImageBase64" @click="handleUpload"></image>
       </view>
     </view>
@@ -97,25 +96,27 @@
 
   const form = reactive({
     operateType: 'add',
-    userId: null,
     loading: false,
     submitLoading: false,
     defaultImageBase64: 'data:image/png;base64,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',
     model: {
+      id: undefined,
       code: '',
       name: '',
       email: '',
       gender: 0,
       avatar: '',
       address: '',
-      status: 'false',
+      status: false,
     }
   });
 
   onLoad((options) => {
     console.log('page-user-details onLoad', options);
     form.operateType = options.operateType;
-    form.userId = options.userId;
+    if (options.userId) {
+      form.model.id = parseInt(options.userId);
+    }
   })
 
   onMounted(async () => {
@@ -135,15 +136,20 @@
   })
 
   const getData = async () => {
-    console.log('getData', form.operateType, form.userId);
-    const res = await userService.getUserOne(form.userId);
+    console.log('getData', form.operateType, form.model.id);
+    const res = await userService.getUserOne(form.model.id);
     form.model.code = res.code;
     form.model.name = res.name;
     form.model.email = res.email;
     form.model.gender = res.gender;
     form.model.avatar = res.avatar;
     form.model.address = res.address;
-    form.model.status = res.status ? 'true' : 'false';
+    form.model.status = res.status ?? false;
+  }
+
+  const handleStatusChange = (e) => {
+    console.log('handleStatusChange', e);
+    form.model.status = e.detail.value;
   }
 
   const handleUpload = () => {
@@ -191,38 +197,28 @@
 
   const handleSubmit = async () => {
     console.log('handleSubmit', form.model);
-    console.log('appStore.getApiServer', appStore.getApiServer);
-    console.log('userStore.getToken', userStore.getToken);
     try {
       form.submitLoading = true;
-      if (!form.model.certificationType) {
+      if (!form.model.code) {
         uni.showToast({
           icon: 'none',
-          title: '证书类型不能为空'
+          title: 'User code can not be empty'
         });
         return;
       }
 
-      if (!form.model.certificationName) {
+      if (!form.model.name) {
         uni.showToast({
           icon: 'none',
-          title: '证书名称不能为空'
+          title: 'User name can not be empty'
         });
         return;
       }
 
-      if (!form.model.issueDate) {
+      if (!form.model.email) {
         uni.showToast({
           icon: 'none',
-          title: '发证日期不能为空'
-        });
-        return;
-      }
-
-      if (!form.model.expireDate) {
-        uni.showToast({
-          icon: 'none',
-          title: '到期日期不能为空'
+          title: 'User email can not be empty'
         });
         return;
       }
@@ -230,30 +226,17 @@
       if (!form.model.avatar) {
         uni.showToast({
           icon: 'none',
-          title: '用户头像不能为空'
+          title: 'User avatar can not be empty'
         });
         return;
       }
 
-      var data = {
-        c_type: form.model.certificationType,
-        name: form.model.certificationName,
-        c_sub_type: form.model.certificationAttribute,
-        number: form.model.certificationCode,
-        external_train_user: form.model.externalTrainUserId,
-        issuing_department: form.model.issuingDepartment,
-        issue_date: form.model.issueDate,
-        review_date: form.model.reviewDate,
-        expiry_date: form.model.expireDate,
-        major: form.model.major,
-        grade_column: form.model.gradeColumn,
-        remark: form.model.remarks
-      };
-      if (!data.external_train_user) {
-        delete data.external_train_user;
+      if (form.model.id) {
+        await userService.modifyUser(form.model);
+      } else {
+        await userService.addUser(form.model);
       }
 
-      await userService.add(data);
       uni.showToast({
         icon: "success",
         title: '提交成功',

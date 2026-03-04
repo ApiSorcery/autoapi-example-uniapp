@@ -21,6 +21,8 @@ service.interceptor.request((config, cancel) => {
   config.baseUrl = '/demo-api';
   if (config.method === 'GET') {
     config.header['content-type'] = ''
+  } else if (['POST', 'PATCH'].includes(config.method)) {
+    config.header['content-type'] = 'application/json'
   }
 
   if (config.method === 'DELETE') {
