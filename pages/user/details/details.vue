@@ -73,15 +73,6 @@
   import * as fileService from '@/services/file.js'
 
   const optionsMap = {
-    status: [{
-      value: 'true',
-      text: 'Enabled',
-      color: '#1677FF'
-    }, {
-      value: 'false',
-      text: 'Disabled',
-      color: '#FD8428'
-    }],
     gender: [{
       value: 0,
       text: 'Unknown',

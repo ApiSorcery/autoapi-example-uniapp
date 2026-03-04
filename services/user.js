@@ -13,9 +13,9 @@ export const addUser = async function(data) {
  * Get single user
  */
 export const getUserOne = async function(id) {
-	return await request.get(
-		`/user/${id}/`
-	);
+  return await request.get(
+    `/user/${id}/`
+  );
 }
 
 /**
@@ -33,5 +33,14 @@ export const getUserPaged = async function(data) {
 export const modifyUser = async function(data) {
   return await request.patch(
     `/user`, data
+  );
+}
+
+/**
+ * Delete user
+ */
+export const removeUser = async function(id) {
+  return await request.remove(
+    `/user/${id}`
   );
 }

@@ -82,12 +82,6 @@
   }
 
   const swipeOptions = [{
-    text: '取消',
-    style: {
-      backgroundColor: '#007aff',
-      borderRadius: '4px 0px 0px 4px'
-    }
-  }, {
     text: '删除',
     style: {
       backgroundColor: '#dd524d',
@@ -162,14 +156,14 @@
 
   const handleSwipeClick = async (e, item) => {
     console.log('handleSwipeClick', e, item);
-    if (e.index === 1) {
+    if (e.index === 0) {
       // 删除
       uni.showModal({
         title: '操作提示',
         content: '此操作将彻底删除当前记录，是否继续？',
         success: async (res) => {
           if (res.confirm) {
-            await trainingCertificationService.remove(item.id)
+            await userService.removeUser(item.id);
             uni.showToast({
               icon: 'none',
               title: '操作成功',
