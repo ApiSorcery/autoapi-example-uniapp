@@ -1,7 +1,7 @@
 <template>
   <view class="page-user-index">
     <view class="items" v-if="(table.dataList||[]).length">
-      <uni-swipe-action class="uni-swipe-action">
+      <uni-swipe-action class="uni-swipe-action" ref="swipeActionRef">
         <uni-swipe-action-item class="uni-swipe-action-item" v-for="(item,index) in table.dataList" :key="index"
           :right-options="swipeOptions" :autoClose="true" @click="(e)=>handleSwipeClick(e,item)">
           <view class="item" @click="()=>handleEdit(item)">
@@ -12,7 +12,7 @@
               </view>
             </view>
             <view class="content">
-              <image class="avatar" :src="item.avatar" mode="aspectFill" ></image>
+              <image class="avatar" :src="item.avatar" mode="aspectFill"></image>
               <view class="fields">
                 <view class="field">
                   <view class="label">Gender:</view>
@@ -50,6 +50,7 @@
 <script setup>
   import dayjs from 'dayjs';
   import {
+    ref,
     reactive
   } from 'vue';
   import {
@@ -81,6 +82,8 @@
     }]
   }
 
+  // 为 uni-swipe-action 组件定义类型
+  const swipeActionRef = ref(null)
   const swipeOptions = [{
     text: '删除',
     style: {
@@ -88,6 +91,7 @@
       borderRadius: '0px 4px 4px 0px'
     }
   }];
+
 
   const table = reactive({
     dataList: [],
@@ -168,12 +172,22 @@
               icon: 'none',
               title: '操作成功',
               success: () => {
-                table.dataList = table.dataList.filter(r => r.id !== item.id);
+                closeAllSwipeItems();
+                getList();
               }
             });
+          } else {
+            closeAllSwipeItems();
           }
         }
       })
+    }
+  }
+
+  // 关闭所有滑动项
+  const closeAllSwipeItems = () => {
+    if (swipeActionRef.value) {
+      swipeActionRef.value.closeAll()
     }
   }
 
