@@ -366,7 +366,7 @@
 
 <style lang="scss" scoped>
   .page-user-index {
-    min-height: 100%;
+    min-height: 100vh;
     background-color: #eceef5;
 
     .search {

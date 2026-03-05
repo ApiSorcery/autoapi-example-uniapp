@@ -247,7 +247,7 @@
 
 <style lang="scss" scoped>
   .page-user-details {
-    height: 100%;
+    height: 100vh;
     overflow: hidden;
     background-color: #eceef5;
     display: flex;
