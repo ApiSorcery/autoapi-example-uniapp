@@ -1,5 +1,10 @@
 <template>
   <view class="page-user-index">
+    <view class="search">
+      <view class="total">{{`共 ${table.total} 条`}}</view>
+      <uni-icons type="settings" size="44rpx" color="#3a66f2" @click="handleSearchTriggle">
+      </uni-icons>
+    </view>
     <view class="items" v-if="(table.dataList||[]).length">
       <uni-swipe-action class="uni-swipe-action" ref="swipeActionRef">
         <uni-swipe-action-item class="uni-swipe-action-item" v-for="(item,index) in table.dataList" :key="index"
@@ -7,8 +12,8 @@
           <view class="item" @click="()=>handleEdit(item)">
             <view class="header">
               <view class="name">{{`${item.name} - ${item.code}`}}</view>
-              <view class="status" :style="{color:optionsMap['status'].find(r=>r.value===item.status)?.color}">
-                {{optionsMap['status'].find(r=>r.value===item.status)?.label}}
+              <view class="status" :style="{color:optionsMap['status'].find(r=>r.value===`${item.status}`)?.color}">
+                {{optionsMap['status'].find(r=>r.value===`${item.status}`)?.text}}
               </view>
             </view>
             <view class="content">
@@ -16,7 +21,7 @@
               <view class="fields">
                 <view class="field">
                   <view class="label">Gender:</view>
-                  <view class="value">{{optionsMap['gender'].find(r=>r.value===item.gender)?.label}}</view>
+                  <view class="value">{{optionsMap['gender'].find(r=>r.value===item.gender)?.text}}</view>
                 </view>
                 <view class="field">
                   <view class="label">Email:</view>
@@ -37,14 +42,49 @@
       </uni-swipe-action>
     </view>
     <view class="items empty" v-else>
-      暂无数据
+      Empty
     </view>
     <view class="footer-commands">
       <view class="commands" @click="handleCommand">
         <text>操作 </text>
-        <icon type="download" size="16" color="#FFFFFF"/>
+        <icon type="download" size="16" color="#FFFFFF" />
       </view>
     </view>
+    <uni-drawer class="search-drawer" ref="searchDrawer" mode="right" :maskClick="false" :width="320">
+      <view class="header">
+        <view class="title">Users Query</view>
+      </view>
+      <view class="fields">
+        <view class="field">
+          <view class="label">User Code：</view>
+          <uni-easyinput class="form-input" trim="all" v-model="search.model.code" placeholder="请输入" :defaultStyle="{
+    					border:'1px solid #dcdfe6',
+    					borderRadius: '8rpx'
+    				}">
+          </uni-easyinput>
+        </view>
+        <view class="field">
+          <view class="label">User Name：</view>
+          <uni-easyinput class="form-input" trim="all" v-model="search.model.name" placeholder="请输入" :defaultStyle="{
+    					border:'1px solid #dcdfe6',
+    					borderRadius: '8rpx'
+    				}">
+          </uni-easyinput>
+        </view>
+        <view class="field">
+          <view class="label">Status：</view>
+          <uni-data-select class="form-input" v-model="search.model.status" :localdata="optionsMap['status']">
+          </uni-data-select>
+        </view>
+      </view>
+      <view class="footer">
+        <view class="commands">
+          <button size="mini" class="command" @click="handleCancel">Cancel</button>
+          <button size="mini" type="primary" class="command" @click="handleQuery">Query</button>
+          <button size="mini" class="command" @click="handleReset">Reset</button>
+        </view>
+      </view>
+    </uni-drawer>
   </view>
 </template>
 
@@ -63,23 +103,23 @@
 
   const optionsMap = {
     status: [{
-      value: true,
-      label: 'Enabled',
+      value: 'true',
+      text: 'Enabled',
       color: '#1677FF'
     }, {
-      value: false,
-      label: 'Disabled',
+      value: 'false',
+      text: 'Disabled',
       color: '#FD8428'
     }],
     gender: [{
       value: 0,
-      label: 'Unknown',
+      text: 'Unknown',
     }, {
       value: 1,
-      label: 'Male',
+      text: 'Male',
     }, {
       value: 2,
-      label: 'Female',
+      text: 'Female',
     }]
   }
 
@@ -101,6 +141,17 @@
     totalPages: 1,
     total: 0,
   });
+
+  const search = reactive({
+    visible: false,
+    model: {
+      code: null,
+      name: null,
+      status: null,
+    }
+  })
+
+  const searchDrawer = ref(null);
 
   onShow(async () => {
     console.log('page-index onShow')
@@ -129,6 +180,29 @@
     }
   });
 
+
+  const handleSearchTriggle = () => {
+    console.log('handleSearchTriggle', searchDrawer.value)
+    searchDrawer.value.open()
+  }
+  const handleCancel = () => {
+    console.log('handleCancel')
+    searchDrawer.value.close()
+  }
+  const handleQuery = async () => {
+    console.log('handleQuery', search.model)
+    await getList();
+    searchDrawer.value.close()
+  }
+  const handleReset = () => {
+    console.log('handleReset', search.model)
+    search.model = {
+      code: null,
+      name: null,
+      status: null
+    }
+  }
+
   const getList = async () => {
     try {
       uni.showLoading({
@@ -137,7 +211,9 @@
       });
       const params = {
         page: table.page,
-        limit: table.pageSize
+        limit: table.pageSize,
+        ...search.model,
+        status: search.model.status ? JSON.parse(search.model.status) : null
       };
       const res = await userService.getUserPaged(params);
       table.total = res.total;
@@ -293,6 +369,20 @@
     min-height: 100%;
     background-color: #eceef5;
 
+    .search {
+      background: #ffffff;
+      padding: 16rpx 36rpx;
+      margin-bottom: 20rpx;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .total {
+        font-size: 28rpx;
+        font-weight: 500;
+      }
+    }
+
     .items {
       padding-bottom: 54px;
       padding-bottom: calc(54px + constant(safe-area-inset-bottom));
@@ -422,6 +512,49 @@
         justify-content: center;
         align-items: center;
         gap: 4px;
+      }
+    }
+
+    .search-drawer {
+      .header {
+        padding: 32rpx 16rpx 0 16rpx;
+
+        .title {
+          font-size: 32rpx;
+          font-weight: bold;
+        }
+      }
+
+      .fields {
+        padding: 0 32rpx;
+
+        .field {
+          margin-top: 32rpx;
+
+          .label {
+            font-size: 14px;
+            font-weight: 400;
+            color: #808080;
+          }
+
+          .form-input {
+            margin-top: 12rpx;
+          }
+        }
+      }
+
+      .footer {
+        margin-top: 48rpx;
+
+        .commands {
+          padding: 0 32rpx;
+          display: flex;
+          justify-content: space-between;
+
+          .command {
+            margin: 0 4rpx;
+          }
+        }
       }
     }
   }
