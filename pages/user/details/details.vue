@@ -6,7 +6,7 @@
           <text class="required">*</text>
           <text>Code:</text>
         </view>
-        <input class="value" :class="{placeholder:!form.model.code,disabled:form.operateType!=='add'}" placeholder="请输入"
+        <input class="value" :class="{placeholder:!form.model.code,disabled:form.operateType!=='add'}" placeholder="Please enter"
           v-model="form.model.code" :disabled="form.operateType!=='add'" />
       </view>
       <view class="field">
@@ -14,14 +14,14 @@
           <text class="required">*</text>
           <text>Name:</text>
         </view>
-        <input class="value" :class="{placeholder:!form.model.name}" placeholder="请输入" v-model="form.model.name" />
+        <input class="value" :class="{placeholder:!form.model.name}" placeholder="Please enter" v-model="form.model.name" />
       </view>
       <view class="field">
         <view class="label">
           <text class="required">*</text>
           <text>Email:</text>
         </view>
-        <input class="value" :class="{placeholder:!form.model.email}" placeholder="请输入" v-model="form.model.email" />
+        <input class="value" :class="{placeholder:!form.model.email}" placeholder="Please enter" v-model="form.model.email" />
       </view>
       <view class="field">
         <view class="label">
@@ -39,7 +39,7 @@
       </view>
       <view class="multi-field">
         <view class="label">Address:</view>
-        <textarea class="m-textarea" v-model="form.model.address" :auto-height="true" :maxlength="500" placeholder="请输入"
+        <textarea class="m-textarea" v-model="form.model.address" :auto-height="true" :maxlength="500" placeholder="Please enter"
           :cursor-spacing="30" />
       </view>
       <view class="image-field">
@@ -122,7 +122,7 @@
     try {
       form.loading = true;
       uni.showLoading({
-        title: '加载中...'
+        title: 'Loading...'
       });
       if (form.operateType === 'edit') {
         await getData();
@@ -237,7 +237,7 @@
 
       uni.showToast({
         icon: "success",
-        title: '提交成功',
+        title: 'Success',
         complete: () => {
           setTimeout(() => {
             uni.navigateBack({

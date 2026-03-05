@@ -1,7 +1,7 @@
 <template>
   <view class="page-user-index">
     <view class="search">
-      <view class="total">{{`共 ${table.total} 条`}}</view>
+      <view class="total">{{`total: ${table.total}`}}</view>
       <uni-icons type="settings" size="44rpx" color="#3a66f2" @click="handleSearchTriggle">
       </uni-icons>
     </view>
@@ -46,7 +46,7 @@
     </view>
     <view class="footer-commands">
       <view class="commands" @click="handleCommand">
-        <text>操作 </text>
+        <text>Actions</text>
         <icon type="download" size="16" color="#FFFFFF" />
       </view>
     </view>
@@ -57,7 +57,7 @@
       <view class="fields">
         <view class="field">
           <view class="label">User Code：</view>
-          <uni-easyinput class="form-input" trim="all" v-model="search.model.code" placeholder="请输入" :defaultStyle="{
+          <uni-easyinput class="form-input" trim="all" v-model="search.model.code" placeholder="Please enter" :defaultStyle="{
     					border:'1px solid #dcdfe6',
     					borderRadius: '8rpx'
     				}">
@@ -65,7 +65,7 @@
         </view>
         <view class="field">
           <view class="label">User Name：</view>
-          <uni-easyinput class="form-input" trim="all" v-model="search.model.name" placeholder="请输入" :defaultStyle="{
+          <uni-easyinput class="form-input" trim="all" v-model="search.model.name" placeholder="Please enter" :defaultStyle="{
     					border:'1px solid #dcdfe6',
     					borderRadius: '8rpx'
     				}">
@@ -73,7 +73,7 @@
         </view>
         <view class="field">
           <view class="label">Status：</view>
-          <uni-data-select class="form-input" v-model="search.model.status" :localdata="optionsMap['status']">
+          <uni-data-select class="form-input" placeholder="Please select" v-model="search.model.status" :localdata="optionsMap['status']">
           </uni-data-select>
         </view>
       </view>
@@ -170,7 +170,7 @@
     console.log('onReachBottom')
     if (table.page >= table.totalPages) {
       uni.showToast({
-        title: '没有更多数据了',
+        title: 'no more data',
         icon: 'none',
         duration: 1000
       })
@@ -206,7 +206,7 @@
   const getList = async () => {
     try {
       uni.showLoading({
-        title: '加载中...',
+        title: 'Loading...',
         mask: true
       });
       const params = {
@@ -240,14 +240,14 @@
     if (e.index === 0) {
       // 删除
       uni.showModal({
-        title: '操作提示',
-        content: '此操作将彻底删除当前记录，是否继续？',
+        title: 'Info',
+        content: 'This operation will permanently delete the record. Continue?',
         success: async (res) => {
           if (res.confirm) {
             await userService.removeUser(item.id);
             uni.showToast({
               icon: 'none',
-              title: '操作成功',
+              title: 'Success',
               success: () => {
                 closeAllSwipeItems();
                 getList();
@@ -277,7 +277,7 @@
 
   const handleCommand = () => {
     uni.showActionSheet({
-      itemList: ['新增用户', '导出'],
+      itemList: ['Add User', 'Export'],
       success: (res) => {
         // res.tapIndex 表示点击了第几个按钮，0是第一个，1是第二个
         if (res.tapIndex === 0) {
@@ -303,14 +303,13 @@
     // #ifdef H5
     // ************ H5端：使用 Blob 处理二进制流 ************
     uni.showLoading({
-      title: '生成文件中...',
+      title: 'file exporting...',
       mask: true
     });
     const res = await userService.exportUsers({});
     // 创建下载链接
     const blobUrl = res.tempFilePath;
     const fileName = `users-${dayjs().format('YYYYMMDDHHmmssSSS')}.xlsx`; // 根据实际情况设置
-    debugger;
     const link = document.createElement('a');
     link.href = blobUrl;
     link.download = fileName;
@@ -323,13 +322,13 @@
 
     uni.hideLoading();
     uni.showToast({
-      title: '导出成功',
+      title: 'Success',
       icon: 'success'
     });
     // #endif
     // #ifndef H5
     uni.showLoading({
-      title: '生成文件中...',
+      title: 'file exporting...',
       mask: true
     });
     const res = await userService.exportUsers({});
@@ -339,7 +338,7 @@
       success: (saveRes) => {
         uni.hideLoading();
         uni.showToast({
-          title: '导出成功'
+          title: 'Success'
         });
         console.log('文件保存路径：', saveRes.savedFilePath);
 
@@ -355,7 +354,7 @@
       fail: (err) => {
         uni.hideLoading();
         uni.showToast({
-          title: '文件保存失败',
+          title: 'File Save failed',
           icon: 'none'
         });
       }
