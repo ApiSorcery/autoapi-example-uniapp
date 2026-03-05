@@ -107,6 +107,13 @@
     form.operateType = options.operateType;
     if (options.userId) {
       form.model.id = parseInt(options.userId);
+      uni.setNavigationBarTitle({
+        title: 'Edit User'
+      })
+    } else {
+      uni.setNavigationBarTitle({
+        title: 'Add User'
+      })
     }
   })
 

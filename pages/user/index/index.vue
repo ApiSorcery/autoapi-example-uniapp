@@ -79,9 +79,9 @@
       </view>
       <view class="footer">
         <view class="commands">
-          <button size="mini" class="command" @click="handleCancel">Cancel</button>
-          <button size="mini" type="primary" class="command" @click="handleQuery">Query</button>
-          <button size="mini" class="command" @click="handleReset">Reset</button>
+          <button size="mini" class="command" @click="handleSearchCancel">Cancel</button>
+          <button size="mini" type="primary" class="command" @click="handleSearchConfirm">Query</button>
+          <button size="mini" class="command" @click="handleSearchReset">Reset</button>
         </view>
       </view>
     </uni-drawer>
@@ -185,17 +185,17 @@
     console.log('handleSearchTriggle', searchDrawer.value)
     searchDrawer.value.open()
   }
-  const handleCancel = () => {
-    console.log('handleCancel')
+  const handleSearchCancel = () => {
+    console.log('handleSearchCancel')
     searchDrawer.value.close()
   }
-  const handleQuery = async () => {
-    console.log('handleQuery', search.model)
+  const handleSearchConfirm = async () => {
+    console.log('handleSearchConfirm', search.model)
     await getList();
     searchDrawer.value.close()
   }
-  const handleReset = () => {
-    console.log('handleReset', search.model)
+  const handleSearchReset = () => {
+    console.log('handleSearchReset', search.model)
     search.model = {
       code: null,
       name: null,

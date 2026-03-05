@@ -3,14 +3,14 @@
     {
       "path": "pages/user/index/index",
       "style": {
-        "navigationBarTitleText": "用户列表页",
+        "navigationBarTitleText": "User Management",
         "enablePullDownRefresh": true
       }
     },
     {
       "path": "pages/user/details/details",
       "style": {
-        "navigationBarTitleText": "用户详情页"
+        "navigationBarTitleText": ""
       }
     }
 	],
