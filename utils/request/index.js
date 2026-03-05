@@ -18,7 +18,12 @@ service.validateStatus = (statusCode) => {
  */
 service.interceptor.request((config, cancel) => {
   console.log('request config', config);
+  // #ifdef H5
   config.baseUrl = '/demo-api';
+  // #endif
+  // #ifndef H5
+  config.baseUrl = 'https://www.apisorcery.com/demo-api';
+  // #endif
   if (config.method === 'GET') {
     config.header['content-type'] = ''
   } else if (['POST', 'PATCH'].includes(config.method)) {
