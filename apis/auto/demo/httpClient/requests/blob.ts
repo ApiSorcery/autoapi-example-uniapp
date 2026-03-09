@@ -8,10 +8,7 @@ const requestClient = axios.create({
   adapter: uniappAdapter,
   baseURL: '/demo-api',
   timeout: 60000,
-  responseType: 'blob',
-  // headers: {
-  //   'X-Requested-With': 'XMLHttpRequest'
-  // }
+  responseType: 'blob'
 })
 
 requestClient.interceptors.request.use(
