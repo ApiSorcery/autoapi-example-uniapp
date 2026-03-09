@@ -164,7 +164,7 @@
       success: async (chooseResult) => {
         const tempFilePath = chooseResult.tempFilePaths[0];
         uni.showLoading({
-          title: '上传中...'
+          title: 'uploading...'
         });
         const imageId = await fileService.uploadFile({
           // #ifdef APP-PLUS
@@ -182,6 +182,7 @@
         })
         console.log('uni.uploadFile success', imageId);
         form.model.avatar = `https://www.apisorcery.com/demo-api/file/${imageId}`
+        uni.hideLoading();
       },
       fail: (error) => {
         console.log('uni.chooseImage error', JSON.stringify(error));

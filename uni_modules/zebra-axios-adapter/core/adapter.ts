@@ -4,9 +4,9 @@ import type { UniAppRequestConfig, UniAppResponse } from './types'
 
 // 添加 createUniAppAdapter 函数的导出
 export function createUniAppAdapter(
-  defaultConfig?: Partial<UniAppRequestConfig>
+  defaultConfig ?: Partial<UniAppRequestConfig>
 ) {
-  return (config: UniAppRequestConfig) => {
+  return (config : UniAppRequestConfig) => {
     return uniappAdapter({
       ...defaultConfig,
       ...config,
@@ -19,8 +19,8 @@ export function createUniAppAdapter(
 }
 
 export default function uniappAdapter(
-  config: InternalAxiosRequestConfig
-): Promise<any> {
+  config : InternalAxiosRequestConfig
+) : Promise<any> {
   return new Promise((resolve, reject) => {
     const {
       url,
@@ -28,12 +28,12 @@ export default function uniappAdapter(
       data,
       timeout,
       withCredentials,
-      validateStatus = (status: number) => status >= 200 && status < 300,
+      validateStatus = (status : number) => status >= 200 && status < 300,
       responseType,
       onProgressUpdate
     } = config as UniAppRequestConfig
 
-    const headers: Record<string, string> = {}
+    const headers : Record<string, string> = {}
 
     if (config.headers) {
       if (config.headers instanceof AxiosHeaders) {
@@ -60,8 +60,8 @@ export default function uniappAdapter(
         : url
 
     // 通用响应处理
-    const handleSuccess = (result: any) => {
-      const response: UniAppResponse = {
+    const handleSuccess = (result : any) => {
+      const response : UniAppResponse = {
         data: result.data,
         statusCode: result.statusCode || 200,
         header: result.header || {},
@@ -102,7 +102,7 @@ export default function uniappAdapter(
     }
 
     // 通用错误处理
-    const handleError = (result: any) => {
+    const handleError = (result : any) => {
       reject(
         new AxiosError(
           result.errMsg || 'Request failed',
@@ -115,12 +115,12 @@ export default function uniappAdapter(
     }
 
     // 处理进度回调
-    const handleProgress = (result: {
-      progress: number
-      totalBytesSent?: number
-      totalBytesExpectedToSend?: number
-      totalBytesWritten?: number
-      totalBytesExpectedToWrite?: number
+    const handleProgress = (result : {
+      progress : number
+      totalBytesSent ?: number
+      totalBytesExpectedToSend ?: number
+      totalBytesWritten ?: number
+      totalBytesExpectedToWrite ?: number
     }) => {
       onProgressUpdate?.(result)
     }
@@ -142,7 +142,7 @@ export default function uniappAdapter(
         delete headers['Content-Type']
       }
 
-      let uploadConfig: UniApp.UploadFileOption = {
+      let uploadConfig : UniApp.UploadFileOption = {
         url: fullUrl!,
         header: headers,
         timeout,
@@ -156,7 +156,7 @@ export default function uniappAdapter(
         if (typeof data === 'string' && data.startsWith('{')) {
           try {
             uploadData = JSON.parse(data)
-          } catch (error: unknown) {
+          } catch (error : unknown) {
             // 如果解析失败，保持原始字符串
             uploadData = data
           }
@@ -193,9 +193,9 @@ export default function uniappAdapter(
         const uploadTask = uni.uploadFile(uploadConfig)
 
         if (onProgressUpdate && uploadTask && !('then' in uploadTask)) {
-          ;(uploadTask as any).onProgressUpdate?.(handleProgress)
+          ; (uploadTask as any).onProgressUpdate?.(handleProgress)
         }
-      } catch (error: unknown) {
+      } catch (error : unknown) {
         if (error instanceof Error) {
           reject(new Error(`Failed to process upload data: ${error.message}`))
         } else {
@@ -218,20 +218,22 @@ export default function uniappAdapter(
       })
 
       if (onProgressUpdate && downloadTask && !('then' in downloadTask)) {
-        ;(downloadTask as any).onProgressUpdate?.(handleProgress)
+        ; (downloadTask as any).onProgressUpdate?.(handleProgress)
       }
 
       return
     }
 
     // 常规请求配置
-    const requestConfig: UniApp.RequestOptions = {
+    const requestConfig : UniApp.RequestOptions = {
       url: fullUrl!,
       method: upperMethod as any,
       header: headers,
       timeout,
       withCredentials,
+      // #ifndef MP-ALIPAY || APP-PLUS
       responseType: responseType as 'text' | 'arraybuffer',
+      // #endif
       dataType: config.responseType === 'json' ? 'json' : 'text',
       success: handleSuccess as any,
       fail: handleError as any
@@ -241,7 +243,7 @@ export default function uniappAdapter(
     if (data || config.params) {
       if (upperMethod === 'GET') {
         // 合并 data 和 params
-        const queryParams: Record<string, string> = {}
+        const queryParams : Record<string, string> = {}
 
         // 处理 params
         if (config.params) {

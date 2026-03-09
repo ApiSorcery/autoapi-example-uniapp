@@ -9,9 +9,9 @@ const requestClient = axios.create({
   baseURL: '/demo-api',
   timeout: 60000,
   responseType: 'blob',
-  headers: {
-    'X-Requested-With': 'XMLHttpRequest'
-  }
+  // headers: {
+  //   'X-Requested-With': 'XMLHttpRequest'
+  // }
 })
 
 requestClient.interceptors.request.use(

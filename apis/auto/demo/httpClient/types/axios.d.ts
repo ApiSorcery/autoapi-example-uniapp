@@ -5,7 +5,7 @@ export interface Result<T = any> {
 }
 
 export interface BlobResp {
-  data: Blob
+  data?: string
   type: string
   name: string
 }

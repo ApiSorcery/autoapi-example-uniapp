@@ -1,5 +1,5 @@
 import type { AxiosResponse } from 'axios'
-import type { Result } from '../types/axios'
+import type { BlobResp, Result } from '../types/axios'
 
 export default {
   onFulfilled: async (res : AxiosResponse<Result>) => {
@@ -10,7 +10,17 @@ export default {
 
     // Return blob format for file download
     if (res.config.responseType === 'blob') {
-      return res.data;
+      debugger;
+      var contentDisposition : string = res.headers['Content-Disposition'] || '';
+      return <BlobResp><unknown>{
+        data: res.data,
+        type: decodeURIComponent(
+          contentDisposition.substring(contentDisposition.lastIndexOf('.') + 1),
+        ),
+        name: decodeURIComponent(
+          contentDisposition.substring(contentDisposition.indexOf('=') + 1),
+        ),
+      };
     }
 
     let dataErrMsg = res.data.message || 'Request failed, please try again later...'

@@ -309,18 +309,17 @@
       title: 'file exporting...',
       mask: true
     });
-    const blobUrl = await userService.exportUsers({});
+    const blobRes = await userService.exportUsers({});
     // 创建下载链接
-    const fileName = `users-${dayjs().format('YYYYMMDDHHmmssSSS')}.xlsx`; // 根据实际情况设置
     const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = fileName;
+    link.href = blobRes.data;
+    link.download = blobRes.name || `users-${dayjs().format('YYYYMMDDHHmmssSSS')}.xlsx`;
     document.body.appendChild(link);
     link.click();
 
     // 清理
     document.body.removeChild(link);
-    window.URL.revokeObjectURL(blobUrl);
+    window.URL.revokeObjectURL(blobRes.data);
 
     uni.hideLoading();
     uni.showToast({
@@ -333,10 +332,11 @@
       title: 'file exporting...',
       mask: true
     });
-    const blobUrl = await userService.exportUsers({});
+    const blobRes = await userService.exportUsers({});
+    debugger;
     // 保存文件到应用沙盒（持久化）
     uni.saveFile({
-      tempFilePath: blobUrl,
+      tempFilePath: blobRes.data,
       success: (saveRes) => {
         uni.hideLoading();
         uni.showToast({
@@ -347,6 +347,7 @@
         // 可选：直接打开文件预览
         uni.openDocument({
           filePath: saveRes.savedFilePath,
+          fileType: blobRes.type,
           showMenu: true,
           fail: (err) => {
             console.log('打开文件失败，但已保存', err);
@@ -354,6 +355,7 @@
         });
       },
       fail: (err) => {
+        console.log('File Save failed', err);
         uni.hideLoading();
         uni.showToast({
           title: 'File Save failed',
@@ -390,6 +392,7 @@
       padding-bottom: calc(54px + env(safe-area-inset-bottom));
 
       &.empty {
+        width: 100%;
         padding-bottom: 0;
         background: #ffffff;
         height: 64px;
@@ -399,6 +402,7 @@
       }
 
       .item {
+        width: 100%;
         margin-bottom: 20rpx;
         padding: 2px 10px 0 10px;
         border: 4px;
