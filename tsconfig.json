@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": true,           // 允许编译器处理 JS 文件
+    "checkJs": false,          // 是否对 JS 文件进行严格类型检查（建议设为 false，避免老代码满屏报错）
+    "noImplicitAny": false,    // 允许隐式的 any 类型，降低混合开发时的报错率
+    "paths": {
+      "@/*": ["./*"]           // 确保路径别名在两种语言下都能识别
+    }
+  }
+}

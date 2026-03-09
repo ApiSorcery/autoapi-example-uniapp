@@ -57,7 +57,8 @@
       <view class="fields">
         <view class="field">
           <view class="label">User Code：</view>
-          <uni-easyinput class="form-input" trim="all" v-model="search.model.code" placeholder="Please enter" :defaultStyle="{
+          <uni-easyinput class="form-input" trim="all" v-model="search.model.code" placeholder="Please enter"
+            :defaultStyle="{
     					border:'1px solid #dcdfe6',
     					borderRadius: '8rpx'
     				}">
@@ -65,7 +66,8 @@
         </view>
         <view class="field">
           <view class="label">User Name：</view>
-          <uni-easyinput class="form-input" trim="all" v-model="search.model.name" placeholder="Please enter" :defaultStyle="{
+          <uni-easyinput class="form-input" trim="all" v-model="search.model.name" placeholder="Please enter"
+            :defaultStyle="{
     					border:'1px solid #dcdfe6',
     					borderRadius: '8rpx'
     				}">
@@ -73,7 +75,8 @@
         </view>
         <view class="field">
           <view class="label">Status：</view>
-          <uni-data-select class="form-input" placeholder="Please select" v-model="search.model.status" :localdata="optionsMap['status']">
+          <uni-data-select class="form-input" placeholder="Please select" v-model="search.model.status"
+            :localdata="optionsMap['status']">
           </uni-data-select>
         </view>
       </view>
@@ -99,7 +102,7 @@
     onPullDownRefresh,
     onReachBottom
   } from '@dcloudio/uni-app';
-  import * as userService from '@/services/user.js';
+  import * as userService from '@/apis/auto/demo/ApiUser.ts'
 
   const optionsMap = {
     status: [{
@@ -306,9 +309,8 @@
       title: 'file exporting...',
       mask: true
     });
-    const res = await userService.exportUsers({});
+    const blobUrl = await userService.exportUsers({});
     // 创建下载链接
-    const blobUrl = res.tempFilePath;
     const fileName = `users-${dayjs().format('YYYYMMDDHHmmssSSS')}.xlsx`; // 根据实际情况设置
     const link = document.createElement('a');
     link.href = blobUrl;
@@ -331,10 +333,10 @@
       title: 'file exporting...',
       mask: true
     });
-    const res = await userService.exportUsers({});
+    const blobUrl = await userService.exportUsers({});
     // 保存文件到应用沙盒（持久化）
     uni.saveFile({
-      tempFilePath: res.tempFilePath,
+      tempFilePath: blobUrl,
       success: (saveRes) => {
         uni.hideLoading();
         uni.showToast({

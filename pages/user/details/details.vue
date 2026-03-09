@@ -6,22 +6,24 @@
           <text class="required">*</text>
           <text>Code:</text>
         </view>
-        <input class="value" :class="{placeholder:!form.model.code,disabled:form.operateType!=='add'}" placeholder="Please enter"
-          v-model="form.model.code" :disabled="form.operateType!=='add'" />
+        <input class="value" :class="{placeholder:!form.model.code,disabled:form.operateType!=='add'}"
+          placeholder="Please enter" v-model="form.model.code" :disabled="form.operateType!=='add'" />
       </view>
       <view class="field">
         <view class="label">
           <text class="required">*</text>
           <text>Name:</text>
         </view>
-        <input class="value" :class="{placeholder:!form.model.name}" placeholder="Please enter" v-model="form.model.name" />
+        <input class="value" :class="{placeholder:!form.model.name}" placeholder="Please enter"
+          v-model="form.model.name" />
       </view>
       <view class="field">
         <view class="label">
           <text class="required">*</text>
           <text>Email:</text>
         </view>
-        <input class="value" :class="{placeholder:!form.model.email}" placeholder="Please enter" v-model="form.model.email" />
+        <input class="value" :class="{placeholder:!form.model.email}" placeholder="Please enter"
+          v-model="form.model.email" />
       </view>
       <view class="field">
         <view class="label">
@@ -39,8 +41,8 @@
       </view>
       <view class="multi-field">
         <view class="label">Address:</view>
-        <textarea class="m-textarea" v-model="form.model.address" :auto-height="true" :maxlength="500" placeholder="Please enter"
-          :cursor-spacing="30" />
+        <textarea class="m-textarea" v-model="form.model.address" :auto-height="true" :maxlength="500"
+          placeholder="Please enter" :cursor-spacing="30" />
       </view>
       <view class="image-field">
         <view class="label">
@@ -69,8 +71,8 @@
   import {
     onLoad
   } from '@dcloudio/uni-app';
-  import * as userService from '@/services/user.js';
-  import * as fileService from '@/services/file.js'
+  import * as userService from '@/apis/auto/demo/ApiUser.ts'
+  import * as fileService from '@/apis/auto/demo/ApiFile.ts'
 
   const optionsMap = {
     gender: [{
@@ -135,7 +137,9 @@
 
   const getData = async () => {
     console.log('getData', form.operateType, form.model.id);
-    const res = await userService.getUserOne(form.model.id);
+    const res = await userService.getUserOne({
+      id: form.model.id
+    });
     form.model.code = res.code;
     form.model.name = res.name;
     form.model.email = res.email;
@@ -171,14 +175,13 @@
           // #endif
           filePath: tempFilePath,
           name: 'file',
-          onProgress: (progressRes) => {
+          onProgressUpdate: (progressRes) => {
             console.log('上传进度：', progressRes.progress);
             // 可以在这里更新进度条
           }
         })
         console.log('uni.uploadFile success', imageId);
         form.model.avatar = `https://www.apisorcery.com/demo-api/file/${imageId}`
-        uni.hideLoading();
       },
       fail: (error) => {
         console.log('uni.chooseImage error', JSON.stringify(error));
