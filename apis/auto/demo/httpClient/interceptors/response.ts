@@ -10,8 +10,13 @@ export default {
 
     // Return blob format for file download
     if (res.config.responseType === 'blob') {
-      debugger;
-      var contentDisposition : string = res.headers['Content-Disposition'] || '';
+      var contentDisposition = '';
+      if (Array.isArray(res.headers['Content-Disposition'])) {
+        contentDisposition = res.headers['Content-Disposition'][0];
+      } else {
+        contentDisposition = res.headers['Content-Disposition'] || ''
+      }
+
       return <BlobResp><unknown>{
         data: res.data,
         type: decodeURIComponent(
