@@ -1,7 +1,7 @@
 {
   "application": {
     "name": "DemoApplication",
-    "language": "ts",
+    "language": "uniapp",
     "outputDir": "./apis/auto"
   },
   "servers": [
@@ -15,7 +15,7 @@
       "returnLevel": "second",
       "returnSecondField": "data",
       "baseStrategy": "always",
-      "httpClientStrategy": "once"
+      "httpClientStrategy": "always"
     }
   ]
 }

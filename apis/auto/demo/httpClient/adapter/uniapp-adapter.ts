@@ -1,47 +1,45 @@
-import { AxiosError, AxiosHeaders } from 'axios'
-import type { AxiosProgressEvent, InternalAxiosRequestConfig } from 'axios'
+import { AxiosError, AxiosHeaders } from 'axios';
+import type { AxiosProgressEvent, InternalAxiosRequestConfig } from 'axios';
 
 // 扩展原始配置接口
 declare module 'axios' {
   export interface AxiosRequestConfig {
-    filePath ?: string;
+    filePath?: string;
     /** 文件名 */
-    name ?: string;
-    formData ?: any;
+    name?: string;
+    formData?: any;
   }
 }
 
-export default function uniappAdapter(
-  config : InternalAxiosRequestConfig
-) : Promise<any> {
+export default function uniappAdapter(config: InternalAxiosRequestConfig): Promise<any> {
   return new Promise((resolve, reject) => {
-    const headers : Record<string, string> = {}
+    const headers: Record<string, string> = {};
     if (config.headers) {
       if (config.headers instanceof AxiosHeaders) {
         for (const [key, value] of Object.entries(config.headers.toJSON())) {
           if (value != null) {
-            headers[key] = String(value)
+            headers[key] = String(value);
           }
         }
       } else {
         for (const [key, value] of Object.entries(config.headers)) {
           if (value != null) {
-            headers[key] = String(value)
+            headers[key] = String(value);
           }
         }
       }
     }
 
     // 修改 URL 处理逻辑
-    const isFullUrl = config.url?.startsWith('http://') || config.url?.startsWith('https://')
+    const isFullUrl = config.url?.startsWith('http://') || config.url?.startsWith('https://');
     const fullUrl = isFullUrl
       ? config.url
       : config.baseURL
-        ? `${config.baseURL}${config.url}`
-        : config.url
+      ? `${config.baseURL}${config.url}`
+      : config.url;
 
     // 通用响应处理
-    const handleSuccess = (result : any) => {
+    const handleSuccess = (result: any) => {
       const response = {
         data: typeof result.data === 'string' ? JSON.parse(result.data) : result.data,
         statusCode: result.statusCode || 200,
@@ -49,7 +47,7 @@ export default function uniappAdapter(
         cookies: result.cookies || [],
         tempFilePath: result.tempFilePath,
         tempFiles: result.tempFiles
-      }
+      };
 
       if (
         typeof config.validateStatus === 'function' &&
@@ -66,9 +64,9 @@ export default function uniappAdapter(
             headers: response.header,
             config
           } as any
-        )
-        reject(error)
-        return
+        );
+        reject(error);
+        return;
       }
 
       resolve({
@@ -79,10 +77,10 @@ export default function uniappAdapter(
         config,
         cookies: response.cookies,
         request: null
-      })
-    }
+      });
+    };
     // 通用错误处理
-    const handleError = (result : any) => {
+    const handleError = (result: any) => {
       reject(
         new AxiosError(
           result.errMsg || 'Request failed',
@@ -91,18 +89,18 @@ export default function uniappAdapter(
           null,
           result
         )
-      )
-    }
+      );
+    };
     // 处理进度回调
-    const handleProgress = (res : {
-      progress : number
-      totalBytesSent ?: number
-      totalBytesExpectedToSend ?: number
-      totalBytesWritten ?: number
-      totalBytesExpectedToWrite ?: number
+    const handleProgress = (res: {
+      progress: number;
+      totalBytesSent?: number;
+      totalBytesExpectedToSend?: number;
+      totalBytesWritten?: number;
+      totalBytesExpectedToWrite?: number;
     }) => {
       // 将 uniapp 的参数包装成 Axios 预期的格式
-      var progressEvent : AxiosProgressEvent = {
+      var progressEvent: AxiosProgressEvent = {
         loaded: res.totalBytesSent,
         total: res.totalBytesExpectedToSend,
         progress: res.progress / 100, // Axios 习惯用 0-1 之间的小数
@@ -110,47 +108,47 @@ export default function uniappAdapter(
         estimated: 0,
         rate: 0,
         upload: true
-      }
+      };
       if (upperMethod === 'DOWNLOAD') {
         config.onDownloadProgress!(progressEvent);
       } else {
         config.onUploadProgress!(progressEvent);
       }
-    }
-    const upperMethod = config.method.toUpperCase()
+    };
+    const upperMethod = config.method.toUpperCase();
 
     // 处理上传请求
     if (upperMethod === 'UPLOAD') {
       if (!config.data) {
-        reject(new Error('Upload method requires data'))
-        return
+        reject(new Error('Upload method requires data'));
+        return;
       }
 
       // 移除 content-type，让浏览器自动设置正确的 multipart/form-data
       if (headers['content-type']) {
-        delete headers['content-type']
+        delete headers['content-type'];
       }
       if (headers['Content-Type']) {
-        delete headers['Content-Type']
+        delete headers['Content-Type'];
       }
 
-      let uploadConfig : UniNamespace.UploadFileOption = {
+      let uploadConfig: UniNamespace.UploadFileOption = {
         url: fullUrl!,
         header: headers,
         timeout: config.timeout,
         success: handleSuccess as any,
         fail: handleError as any
-      }
+      };
 
       try {
         // 尝试解析数据
-        let uploadData = config.data
+        let uploadData = config.data;
         if (typeof config.data === 'string' && config.data.startsWith('{')) {
           try {
-            uploadData = JSON.parse(config.data)
-          } catch (error : unknown) {
+            uploadData = JSON.parse(config.data);
+          } catch (error: unknown) {
             // 如果解析失败，保持原始字符串
-            uploadData = config.data
+            uploadData = config.data;
           }
         }
 
@@ -162,7 +160,7 @@ export default function uniappAdapter(
             filePath: uploadData,
             name: config.name || 'file',
             formData: config.formData
-          }
+          };
         } else if (typeof uploadData === 'object' && 'filePath' in uploadData) {
           // 第二种方式：传递对象配置
           uploadConfig = {
@@ -170,31 +168,31 @@ export default function uniappAdapter(
             filePath: uploadData.filePath,
             name: uploadData.name || 'file',
             formData: uploadData.formData
-          }
+          };
         } else {
-          reject(new Error('Invalid upload data format'))
-          return
+          reject(new Error('Invalid upload data format'));
+          return;
         }
 
         // 验证必要的参数
         if (!uploadConfig.filePath) {
-          reject(new Error('Upload filePath is required'))
-          return
+          reject(new Error('Upload filePath is required'));
+          return;
         }
 
-        const uploadTask = uni.uploadFile(uploadConfig)
+        const uploadTask = uni.uploadFile(uploadConfig);
         if (config.onUploadProgress && uploadTask && !('then' in uploadTask)) {
-          ; (uploadTask as any).onProgressUpdate?.(handleProgress)
+          (uploadTask as any).onProgressUpdate?.(handleProgress);
         }
-      } catch (error : unknown) {
+      } catch (error: unknown) {
         if (error instanceof Error) {
-          reject(new Error(`Failed to process upload data: ${error.message}`))
+          reject(new Error(`Failed to process upload data: ${error.message}`));
         } else {
-          reject(new Error('Failed to process upload data'))
+          reject(new Error('Failed to process upload data'));
         }
       }
 
-      return
+      return;
     }
 
     // 处理下载请求
@@ -206,17 +204,17 @@ export default function uniappAdapter(
         filePath: config.filePath,
         success: handleSuccess as any,
         fail: handleError as any
-      })
+      });
 
       if (config.onDownloadProgress && downloadTask && !('then' in downloadTask)) {
-        ; (downloadTask as any).onProgressUpdate?.(handleProgress)
+        (downloadTask as any).onProgressUpdate?.(handleProgress);
       }
 
-      return
+      return;
     }
 
     // 常规请求配置
-    const requestConfig : UniNamespace.RequestOptions = {
+    const requestConfig: UniNamespace.RequestOptions = {
       url: fullUrl!,
       method: upperMethod as any,
       header: headers,
@@ -228,51 +226,47 @@ export default function uniappAdapter(
       dataType: config.responseType === 'json' ? 'json' : 'text',
       success: handleSuccess as any,
       fail: handleError as any
-    }
+    };
 
     // 处理请求数据
     if (config.data || config.params) {
       if (upperMethod === 'GET') {
         // 合并 data 和 params
-        const queryParams : Record<string, string> = {}
+        const queryParams: Record<string, string> = {};
 
         // 处理 params
         if (config.params) {
           Object.entries(config.params).forEach(([key, value]) => {
             if (value != null) {
-              queryParams[key] = String(value)
+              queryParams[key] = String(value);
             }
-          })
+          });
         }
 
         // 处理 data
         if (config.data) {
           Object.entries(config.data).forEach(([key, value]) => {
             if (value != null) {
-              queryParams[key] = String(value)
+              queryParams[key] = String(value);
             }
-          })
+          });
         }
 
         // 构建查询字符串
         const queryString = Object.entries(queryParams)
-          .map(
-            ([key, value]) =>
-              `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
-          )
-          .join('&')
+          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+          .join('&');
 
         if (queryString) {
-          requestConfig.url +=
-            (requestConfig.url.includes('?') ? '&' : '?') + queryString
+          requestConfig.url += (requestConfig.url.includes('?') ? '&' : '?') + queryString;
         }
       } else {
         requestConfig.data =
-          typeof config.data === 'object' ? JSON.stringify(config.data) : config.data
+          typeof config.data === 'object' ? JSON.stringify(config.data) : config.data;
       }
     }
 
     // 发起请求
-    uni.request(requestConfig)
-  })
+    uni.request(requestConfig);
+  });
 }
