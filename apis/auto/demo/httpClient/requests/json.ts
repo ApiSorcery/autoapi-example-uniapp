@@ -7,10 +7,7 @@ import responseInterceptor from '../interceptors/response'
 const requestClient = axios.create({
   adapter: uniappAdapter,
   timeout: 60000,
-  responseType: 'json',
-  headers: {
-    'X-Requested-With': 'XMLHttpRequest'
-  }
+  responseType: 'json'
 })
 
 requestClient.interceptors.request.use(
