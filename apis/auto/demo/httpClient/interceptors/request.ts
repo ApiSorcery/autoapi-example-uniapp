@@ -18,7 +18,6 @@ const removeEmptyProperty = function (
 
 export default {
   onFulfilled: (config : InternalAxiosRequestConfig<any>) => {
-    console.log('请求配置：', config)
     // #ifdef H5
     config.baseURL = '/demo-api';
     // #endif

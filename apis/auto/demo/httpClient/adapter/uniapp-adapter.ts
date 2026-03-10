@@ -1,20 +1,13 @@
 import { AxiosError, AxiosHeaders } from 'axios'
-import type { InternalAxiosRequestConfig } from 'axios'
-import type { UniAppRequestConfig, UniAppResponse } from './types'
+import type { AxiosProgressEvent, InternalAxiosRequestConfig } from 'axios'
 
-// 添加 createUniAppAdapter 函数的导出
-export function createUniAppAdapter(
-  defaultConfig ?: Partial<UniAppRequestConfig>
-) {
-  return (config : UniAppRequestConfig) => {
-    return uniappAdapter({
-      ...defaultConfig,
-      ...config,
-      headers: new AxiosHeaders({
-        ...defaultConfig?.headers,
-        ...config.headers
-      })
-    } as InternalAxiosRequestConfig)
+// 扩展原始配置接口
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    filePath ?: string;
+    /** 文件名 */
+    name ?: string;
+    formData ?: any;
   }
 }
 
@@ -22,19 +15,7 @@ export default function uniappAdapter(
   config : InternalAxiosRequestConfig
 ) : Promise<any> {
   return new Promise((resolve, reject) => {
-    const {
-      url,
-      method = 'GET',
-      data,
-      timeout,
-      withCredentials,
-      validateStatus = (status : number) => status >= 200 && status < 300,
-      responseType,
-      onProgressUpdate
-    } = config as UniAppRequestConfig
-
     const headers : Record<string, string> = {}
-
     if (config.headers) {
       if (config.headers instanceof AxiosHeaders) {
         for (const [key, value] of Object.entries(config.headers.toJSON())) {
@@ -52,16 +33,16 @@ export default function uniappAdapter(
     }
 
     // 修改 URL 处理逻辑
-    const isFullUrl = url?.startsWith('http://') || url?.startsWith('https://')
+    const isFullUrl = config.url?.startsWith('http://') || config.url?.startsWith('https://')
     const fullUrl = isFullUrl
-      ? url
+      ? config.url
       : config.baseURL
-        ? `${config.baseURL}${url}`
-        : url
+        ? `${config.baseURL}${config.url}`
+        : config.url
 
     // 通用响应处理
     const handleSuccess = (result : any) => {
-      const response : UniAppResponse = {
+      const response = {
         data: result.data,
         statusCode: result.statusCode || 200,
         header: result.header || {},
@@ -71,8 +52,8 @@ export default function uniappAdapter(
       }
 
       if (
-        typeof validateStatus === 'function' &&
-        !validateStatus(response.statusCode)
+        typeof config.validateStatus === 'function' &&
+        !config.validateStatus(response.statusCode)
       ) {
         const error = new AxiosError(
           `Request failed with status code ${response.statusCode}`,
@@ -100,7 +81,6 @@ export default function uniappAdapter(
         request: null
       })
     }
-
     // 通用错误处理
     const handleError = (result : any) => {
       reject(
@@ -113,23 +93,35 @@ export default function uniappAdapter(
         )
       )
     }
-
     // 处理进度回调
-    const handleProgress = (result : {
+    const handleProgress = (res : {
       progress : number
       totalBytesSent ?: number
       totalBytesExpectedToSend ?: number
       totalBytesWritten ?: number
       totalBytesExpectedToWrite ?: number
     }) => {
-      onProgressUpdate?.(result)
+      // 将 uniapp 的参数包装成 Axios 预期的格式
+      var progressEvent : AxiosProgressEvent = {
+        loaded: res.totalBytesSent,
+        total: res.totalBytesExpectedToSend,
+        progress: res.progress / 100, // Axios 习惯用 0-1 之间的小数
+        bytes: res.totalBytesSent,
+        estimated: 0,
+        rate: 0,
+        upload: true
+      }
+      if (upperMethod === 'DOWNLOAD') {
+        config.onDownloadProgress!(progressEvent);
+      } else {
+        config.onUploadProgress!(progressEvent);
+      }
     }
-
-    const upperMethod = method.toUpperCase()
+    const upperMethod = config.method.toUpperCase()
 
     // 处理上传请求
     if (upperMethod === 'UPLOAD') {
-      if (!data) {
+      if (!config.data) {
         reject(new Error('Upload method requires data'))
         return
       }
@@ -142,23 +134,23 @@ export default function uniappAdapter(
         delete headers['Content-Type']
       }
 
-      let uploadConfig : UniApp.UploadFileOption = {
+      let uploadConfig : UniNamespace.UploadFileOption = {
         url: fullUrl!,
         header: headers,
-        timeout,
+        timeout: config.timeout,
         success: handleSuccess as any,
         fail: handleError as any
       }
 
       try {
         // 尝试解析数据
-        let uploadData = data
-        if (typeof data === 'string' && data.startsWith('{')) {
+        let uploadData = config.data
+        if (typeof config.data === 'string' && config.data.startsWith('{')) {
           try {
-            uploadData = JSON.parse(data)
+            uploadData = JSON.parse(config.data)
           } catch (error : unknown) {
             // 如果解析失败，保持原始字符串
-            uploadData = data
+            uploadData = config.data
           }
         }
 
@@ -168,8 +160,8 @@ export default function uniappAdapter(
           uploadConfig = {
             ...uploadConfig,
             filePath: uploadData,
-            name: (config as UniAppRequestConfig).name || 'file',
-            formData: (config as UniAppRequestConfig).formData
+            name: config.name || 'file',
+            formData: config.formData
           }
         } else if (typeof uploadData === 'object' && 'filePath' in uploadData) {
           // 第二种方式：传递对象配置
@@ -191,8 +183,7 @@ export default function uniappAdapter(
         }
 
         const uploadTask = uni.uploadFile(uploadConfig)
-
-        if (onProgressUpdate && uploadTask && !('then' in uploadTask)) {
+        if (config.onUploadProgress && uploadTask && !('then' in uploadTask)) {
           ; (uploadTask as any).onProgressUpdate?.(handleProgress)
         }
       } catch (error : unknown) {
@@ -211,13 +202,13 @@ export default function uniappAdapter(
       const downloadTask = uni.downloadFile({
         url: fullUrl!,
         header: headers,
-        timeout,
-        filePath: (config as UniAppRequestConfig).filePath,
+        timeout: config.timeout,
+        filePath: config.filePath,
         success: handleSuccess as any,
         fail: handleError as any
       })
 
-      if (onProgressUpdate && downloadTask && !('then' in downloadTask)) {
+      if (config.onDownloadProgress && downloadTask && !('then' in downloadTask)) {
         ; (downloadTask as any).onProgressUpdate?.(handleProgress)
       }
 
@@ -225,14 +216,14 @@ export default function uniappAdapter(
     }
 
     // 常规请求配置
-    const requestConfig : UniApp.RequestOptions = {
+    const requestConfig : UniNamespace.RequestOptions = {
       url: fullUrl!,
       method: upperMethod as any,
       header: headers,
-      timeout,
-      withCredentials,
+      timeout: config.timeout,
+      withCredentials: config.withCredentials,
       // #ifndef MP-ALIPAY || APP-PLUS
-      responseType: responseType as 'text' | 'arraybuffer',
+      responseType: config.responseType as 'text' | 'arraybuffer',
       // #endif
       dataType: config.responseType === 'json' ? 'json' : 'text',
       success: handleSuccess as any,
@@ -240,7 +231,7 @@ export default function uniappAdapter(
     }
 
     // 处理请求数据
-    if (data || config.params) {
+    if (config.data || config.params) {
       if (upperMethod === 'GET') {
         // 合并 data 和 params
         const queryParams : Record<string, string> = {}
@@ -255,8 +246,8 @@ export default function uniappAdapter(
         }
 
         // 处理 data
-        if (data) {
-          Object.entries(data).forEach(([key, value]) => {
+        if (config.data) {
+          Object.entries(config.data).forEach(([key, value]) => {
             if (value != null) {
               queryParams[key] = String(value)
             }
@@ -277,7 +268,7 @@ export default function uniappAdapter(
         }
       } else {
         requestConfig.data =
-          typeof data === 'object' ? JSON.stringify(data) : data
+          typeof config.data === 'object' ? JSON.stringify(config.data) : config.data
       }
     }
 

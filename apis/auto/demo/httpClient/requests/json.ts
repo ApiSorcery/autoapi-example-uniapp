@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { uniappAdapter } from '@/uni_modules/zebra-axios-adapter'
+import uniappAdapter from '../adapter/uniapp-adapter'
 import requestInterceptor from '../interceptors/request'
 import responseInterceptor from '../interceptors/response'
 

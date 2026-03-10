@@ -22,11 +22,11 @@ export const getFile = base.createJsonRequest<Model.GetFileRequest,string>((req)
  * Upload file
  */
 export const uploadFile = base.createJsonRequest<Model.UploadFileRequest,string>((data) => {
-  const { onProgressUpdate, ...rest } = data;
+  const { onUploadProgress, ...rest } = data;
   return {
     url: `/file/upload`,
     method: 'UPLOAD',
     data: rest,
-    onProgressUpdate,
+    onUploadProgress,
   };
 })

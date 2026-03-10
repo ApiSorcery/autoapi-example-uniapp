@@ -3,7 +3,6 @@ import type { BlobResp, Result } from '../types/axios'
 
 export default {
   onFulfilled: async (res : AxiosResponse<Result>) => {
-    console.log('响应数据：', res)
     if (res.data.status === 0) {
       return res.data.data
     }

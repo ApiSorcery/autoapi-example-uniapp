@@ -10,6 +10,9 @@ export interface ExportUsersRequest {
 
   /** Email address */
   email : string;
+  
+  /** Download progress callback function */
+  onDownloadProgress : (progressEvent : AxiosProgressEvent) => void;
 }
 
 /** Get single user request parameters */
@@ -49,7 +52,7 @@ export interface UploadFileRequest {
   name ?: string,
   formData ?: Record<string, any>,
   /** Upload progress callback function */
-  onProgressUpdate : (progressEvent : AxiosProgressEvent) => void;
+  onUploadProgress : (progressEvent : AxiosProgressEvent) => void;
 }
 
 /** Query user list with pagination response parameters */
