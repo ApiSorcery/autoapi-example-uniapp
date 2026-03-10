@@ -175,7 +175,7 @@
           // #endif
           filePath: tempFilePath,
           name: 'file',
-          onProgressUpdate: (progressRes) => {
+          onUploadProgress: (progressRes) => {
             console.log('上传进度：', progressRes.progress);
             // 可以在这里更新进度条
           }
