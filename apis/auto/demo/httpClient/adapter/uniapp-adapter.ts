@@ -43,7 +43,7 @@ export default function uniappAdapter(
     // 通用响应处理
     const handleSuccess = (result : any) => {
       const response = {
-        data: result.data,
+        data: typeof result.data === 'string' ? JSON.parse(result.data) : result.data,
         statusCode: result.statusCode || 200,
         header: result.header || {},
         cookies: result.cookies || [],
@@ -223,7 +223,7 @@ export default function uniappAdapter(
       timeout: config.timeout,
       withCredentials: config.withCredentials,
       // #ifndef MP-ALIPAY || APP-PLUS
-      responseType: config.responseType as 'text' | 'arraybuffer',
+      responseType: config.responseType === 'arraybuffer' ? 'arraybuffer' : 'text',
       // #endif
       dataType: config.responseType === 'json' ? 'json' : 'text',
       success: handleSuccess as any,

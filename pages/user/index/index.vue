@@ -401,6 +401,7 @@
       }
 
       .item {
+        box-sizing: border-box;
         width: 100%;
         margin-bottom: 20rpx;
         padding: 2px 10px 0 10px;
