@@ -106,7 +106,7 @@ autoapi-example-uniapp/
 
 ## API Configuration
 
-The application uses AutoAPI to generate type-safe API client code. Configuration is in `.autoapirc.json`:
+The application uses AutoAPI to generate type-safe API client code. Configuration is in `.apisorceryrc.json`:
 
 ```json
 {
