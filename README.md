@@ -1,6 +1,6 @@
 # ApiSorcery - UniApp Example
 
-This is a UniApp cross-platform application that demonstrates API integration using AutoAPI. It can be compiled to multiple platforms including H5, WeChat Mini Program, iOS, and Android.
+This is a UniApp cross-platform application that demonstrates API integration using ApiSorcery. It can be compiled to multiple platforms including H5, WeChat Mini Program, iOS, and Android.
 
 ## Features
 
@@ -10,7 +10,7 @@ This is a UniApp cross-platform application that demonstrates API integration us
 - ✅ Form Validation
 - ✅ Image Upload
 - ✅ Status Management
-- ✅ Type-safe API calls with AutoAPI
+- ✅ Type-safe API calls with ApiSorcery
 - ✅ Cross-platform support
 
 ## Tech Stack
@@ -20,7 +20,7 @@ This is a UniApp cross-platform application that demonstrates API integration us
 - **TypeScript** - Type safety
 - **Axios** - HTTP client
 - **Day.js** - Date formatting
-- **AutoAPI** - API code generation
+- **ApiSorcery** - API code generation
 
 ## Supported Platforms
 
@@ -84,7 +84,7 @@ npm run dev:mp-weixin
 ## Project Structure
 
 ```
-autoapi-example-uniapp/
+apisorcery-example-uniapp/
 ├── apis/
 │   └── auto/              # Auto-generated API code
 │       └── demo/
@@ -106,7 +106,7 @@ autoapi-example-uniapp/
 
 ## API Configuration
 
-The application uses AutoAPI to generate type-safe API client code. Configuration is in `.apisorceryrc.json`:
+The application uses ApiSorcery to generate type-safe API client code. Configuration is in `.apisorceryrc.json`:
 
 ```json
 {
@@ -267,7 +267,7 @@ Use the provided deployment script:
 
 - [UniApp Documentation](https://uniapp.dcloud.io/)
 - [Vue 3 Documentation](https://vuejs.org/)
-- [AutoAPI Documentation](https://apisorcery.com/)
+- [ApiSorcery Documentation](https://apisorcery.com/)
 
 ## License
 
