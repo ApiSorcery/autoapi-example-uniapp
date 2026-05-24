@@ -9,7 +9,7 @@ ARCHIVE_NAME="web-$(date +%Y%m%d-%H%M%S).tar.gz"
 echo "开始构建生产环境..."
 
 # 构建生产环境
-cli publish web --project autoapi-example-uniapp
+cli publish web --project apisorcery_demo_uniapp
 
 if [ $? -ne 0 ]; then
     echo "构建失败，退出部署"
