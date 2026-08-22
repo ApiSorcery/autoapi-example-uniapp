@@ -5,7 +5,7 @@ import * as Model from './model';
 /**
  * Add user
  */
-export const addUser = base.createJsonRequest<Model.UserAddRequestDto>((data) => ({
+export const addUser = base.createJsonRequest<Model.UserAddRequestDto, number>((data) => ({
   url: `/user`,
   method: 'POST',
   data
@@ -14,24 +14,29 @@ export const addUser = base.createJsonRequest<Model.UserAddRequestDto>((data) =>
 /**
  * Batch export users (Excel)
  */
-export const exportUsers = base.createJsonRequest<Model.ExportUsersRequest>((params) => ({
+export const exportUsers = base.createDownloadRequest<Model.ExportUsersRequest>((params) => ({
   url: `/user/export`,
-  method: 'GET',
+  method: 'DOWNLOAD',
   params
 }));
 
 /**
  * Get single user
  */
-export const getUserOne = base.createJsonRequest<Model.GetUserOneRequest>((req) => ({
-  url: `/user/${req.id}`,
-  method: 'GET'
-}));
+export const getUserOne = base.createJsonRequest<Model.GetUserOneRequest, Model.UserInfoDto>(
+  (req) => ({
+    url: `/user/${req.id}`,
+    method: 'GET'
+  })
+);
 
 /**
  * Query user list with pagination
  */
-export const getUserPaged = base.createJsonRequest<Model.UserPageQueryDto>((data) => ({
+export const getUserPaged = base.createJsonRequest<
+  Model.UserPageQueryDto,
+  Model.GetUserPagedResponse
+>((data) => ({
   url: `/user/paged`,
   method: 'POST',
   data
@@ -57,8 +62,10 @@ export const removeUser = base.createJsonRequest<Model.RemoveUserRequest>((req) 
 /**
  * Validate if user code exists
  */
-export const validateCode = base.createJsonRequest<Model.ValidateCodeRequest>((params) => ({
-  url: `/user/validateCode`,
-  method: 'GET',
-  params
-}));
+export const validateCode = base.createJsonRequest<Model.ValidateCodeRequest, boolean>(
+  (params) => ({
+    url: `/user/validateCode`,
+    method: 'GET',
+    params
+  })
+);

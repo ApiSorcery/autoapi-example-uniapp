@@ -13,7 +13,7 @@ export const deleteFile = base.createJsonRequest<Model.DeleteFileRequest>((req) 
 /**
  * Get file
  */
-export const getFile = base.createJsonRequest<Model.GetFileRequest>((req) => ({
+export const getFile = base.createJsonRequest<Model.GetFileRequest, string>((req) => ({
   url: `/file/${req.id}`,
   method: 'GET'
 }));
@@ -21,7 +21,7 @@ export const getFile = base.createJsonRequest<Model.GetFileRequest>((req) => ({
 /**
  * Upload file
  */
-export const uploadFile = base.createJsonRequest<Model.UploadFileRequest>((data) => {
+export const uploadFile = base.createJsonRequest<Model.UploadFileRequest, string>((data) => {
   const { onUploadProgress, ...rest } = data;
   return {
     url: `/file/upload`,
